@@ -12,15 +12,18 @@ namespace SpotDifferenceGame
         private Bitmap image1, image2;
         private List<Point> differences = new List<Point>();
         private List<Point> foundDifferences = new List<Point>();
-        private int totalDifferences = 5; // Default number of differences
+        private int totalDifferences = 5;
         private int remainingDifferences;
         private int attemptsLeft;
         private int timeLeft;
         private GameMode currentGameMode;
         private DifficultyLevel currentDifficulty;
+        private bool isSetupMode = true;
+        private int setupClicksCount = 0;
 
         // Visual elements
         private Pen circlePen = new Pen(Color.Red, 3);
+        private Pen setupPen = new Pen(Color.LimeGreen, 3);
         private Brush correctBrush = new SolidBrush(Color.FromArgb(100, Color.Green));
         private Brush wrongBrush = new SolidBrush(Color.FromArgb(100, Color.Red));
 
@@ -32,31 +35,26 @@ namespace SpotDifferenceGame
         {
             InitializeComponent();
             InitializeGame();
+            UpdateDifficultySettings();
         }
 
         private void InitializeGame()
         {
-            // Set default values
-            currentGameMode = GameMode.TimeLimit;
-            currentDifficulty = DifficultyLevel.Medium;
-            UpdateDifficultySettings();
+            isSetupMode = true;
+            setupClicksCount = 0;
+            differences.Clear();
+            foundDifferences.Clear();
 
-            // Initialize UI
             lblFound.Text = "Found: 0";
             lblRemaining.Text = "Remaining: " + totalDifferences;
-            lblTime.Visible = currentGameMode == GameMode.TimeLimit;
-            lblAttempts.Visible = currentGameMode == GameMode.AttemptLimit;
+            lblSetupStatus.Text = $"Marked: 0/{totalDifferences} points";
 
-            // Reset game state
-            foundDifferences.Clear();
-            differences.Clear();
             pictureBox1.Refresh();
             pictureBox2.Refresh();
+
+            btnStartGame.Enabled = false;
+            btnStartSetup.Enabled = true;
         }
-
-
-
-       
 
         private void btnLoadImages_Click(object sender, EventArgs e)
         {
@@ -65,33 +63,42 @@ namespace SpotDifferenceGame
             openFileDialog.Multiselect = true;
             openFileDialog.Title = "Select Two Images";
 
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            if (openFileDialog.ShowDialog() == DialogResult.OK && openFileDialog.FileNames.Length == 2)
             {
-                if (openFileDialog.FileNames.Length == 2)
+                try
                 {
-                    try
-                    {
-                        image1 = new Bitmap(openFileDialog.FileNames[0]);
-                        image2 = new Bitmap(openFileDialog.FileNames[1]);
+                    image1 = new Bitmap(openFileDialog.FileNames[0]);
+                    image2 = new Bitmap(openFileDialog.FileNames[1]);
 
-                        // Scale images to fit picture boxes while maintaining aspect ratio
-                        pictureBox1.Image = ScaleImage(image1, pictureBox1.Width, pictureBox1.Height);
-                        pictureBox2.Image = ScaleImage(image2, pictureBox2.Width, pictureBox2.Height);
+                    pictureBox1.Image = ScaleImage(image1, pictureBox1.Width, pictureBox1.Height);
+                    pictureBox2.Image = ScaleImage(image2, pictureBox2.Width, pictureBox2.Height);
 
-                        // Generate random differences (for demo purposes)
-                        GenerateDifferences();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Error loading images: " + ex.Message);
-                    }
+                    btnStartSetup.Enabled = true;
+                    btnStartGame.Enabled = false;
+                    lblSetupStatus.Text = $"Marked: 0/{totalDifferences} points";
+                    isSetupMode = true;
                 }
-                else
+                catch (Exception ex)
                 {
-                    MessageBox.Show("Please select exactly two images.");
+                    MessageBox.Show("Error loading images: " + ex.Message);
                 }
             }
         }
+
+
+        private void pictureBox1_Paint(object sender, PaintEventArgs e)
+        {
+            DrawFeedback(e.Graphics, pictureBox1);
+        }
+
+        private void pictureBox2_Paint(object sender, PaintEventArgs e)
+        {
+            DrawFeedback(e.Graphics, pictureBox2);
+        }
+
+
+
+
 
         private Bitmap ScaleImage(Bitmap original, int maxWidth, int maxHeight)
         {
@@ -112,36 +119,57 @@ namespace SpotDifferenceGame
             return newImage;
         }
 
-        private void GenerateDifferences()
-        {
-            differences.Clear();
-            Random rand = new Random();
-
-            for (int i = 0; i < totalDifferences; i++)
-            {
-                int x = rand.Next(20, pictureBox1.Width - 20);
-                int y = rand.Next(20, pictureBox1.Height - 20);
-                differences.Add(new Point(x, y));
-            }
-
-            remainingDifferences = totalDifferences;
-            lblRemaining.Text = "Remaining: " + remainingDifferences;
-            lblFound.Text = "Found: 0";
-            foundDifferences.Clear();
-        }
-
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
-            if (image1 == null || image2 == null) return;
-
-            CheckDifference(e.Location, pictureBox1);
+            HandlePictureBoxClick(e.Location, pictureBox1);
         }
 
         private void pictureBox2_MouseClick(object sender, MouseEventArgs e)
         {
-            if (image1 == null || image2 == null) return;
+            HandlePictureBoxClick(e.Location, pictureBox2);
+        }
 
-            CheckDifference(e.Location, pictureBox2);
+        private void HandlePictureBoxClick(Point clickPoint, PictureBox pictureBox)
+        {
+            if (isSetupMode)
+            {
+                HandleSetupClick(clickPoint, pictureBox);
+            }
+            else
+            {
+                CheckDifference(clickPoint, pictureBox);
+            }
+        }
+
+        private void HandleSetupClick(Point clickPoint, PictureBox pictureBox)
+        {
+            if (setupClicksCount >= totalDifferences)
+            {
+                MessageBox.Show("Maximum differences marked!");
+                return;
+            }
+
+            if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
+            {
+                var toRemove = differences.FindLast(p =>
+                    Math.Abs(p.X - clickPoint.X) < 20 &&
+                    Math.Abs(p.Y - clickPoint.Y) < 20);
+
+                if (toRemove != null)
+                {
+                    differences.Remove(toRemove);
+                    setupClicksCount--;
+                }
+            }
+            else
+            {
+                differences.Add(clickPoint);
+                setupClicksCount++;
+            }
+
+            lblSetupStatus.Text = $"Marked: {setupClicksCount}/{totalDifferences} points";
+            btnStartGame.Enabled = (setupClicksCount == totalDifferences);
+            pictureBox.Refresh();
         }
 
         private void CheckDifference(Point clickPoint, PictureBox pictureBox)
@@ -153,132 +181,91 @@ namespace SpotDifferenceGame
             }
 
             bool isCorrect = false;
-
             foreach (Point diff in differences)
             {
-                // Calculate distance between click and difference point
                 double distance = Math.Sqrt(Math.Pow(clickPoint.X - diff.X, 2) + Math.Pow(clickPoint.Y - diff.Y, 2));
-
-                if (distance < 20) // Within 20 pixels is considered correct
+                if (distance < 20 && !foundDifferences.Contains(diff))
                 {
-                    if (!foundDifferences.Contains(diff))
-                    {
-                        foundDifferences.Add(diff);
-                        remainingDifferences--;
-                        isCorrect = true;
-
-                        // Play correct sound
-                        correctSound.Play();
-
-                        break;
-                    }
+                    foundDifferences.Add(diff);
+                    remainingDifferences--;
+                    isCorrect = true;
+                    correctSound.Play();
+                    break;
                 }
             }
 
             if (!isCorrect)
             {
-                // Play wrong sound
                 wrongSound.Play();
-
                 if (currentGameMode == GameMode.AttemptLimit)
                 {
                     attemptsLeft--;
                     lblAttempts.Text = "Attempts: " + attemptsLeft;
-
-                    if (attemptsLeft <= 0)
-                    {
-                        MessageBox.Show("Game Over! You've used all your attempts.");
-                    }
+                    if (attemptsLeft <= 0) MessageBox.Show("Game Over!");
                 }
             }
 
-            // Update UI
+            UpdateGameDisplay();
+            if (remainingDifferences <= 0) EndGameWithVictory();
+        }
+
+        private void UpdateGameDisplay()
+        {
             lblFound.Text = "Found: " + foundDifferences.Count;
             lblRemaining.Text = "Remaining: " + remainingDifferences;
-
-            // Redraw to show feedback
             pictureBox1.Refresh();
             pictureBox2.Refresh();
-
-            // Check if game is won
-            if (remainingDifferences <= 0)
-            {
-                timer1.Stop();
-                MessageBox.Show("Congratulations! You found all the differences!");
-            }
         }
 
-        private void pictureBox1_Paint(object sender, PaintEventArgs e)
+        private void EndGameWithVictory()
         {
-            DrawFeedback(e.Graphics, pictureBox1);
-        }
-
-        private void pictureBox2_Paint(object sender, PaintEventArgs e)
-        {
-            DrawFeedback(e.Graphics, pictureBox2);
+            timer1.Stop();
+            MessageBox.Show("Congratulations! All differences found!");
         }
 
         private void DrawFeedback(Graphics g, PictureBox pictureBox)
         {
-            foreach (Point found in foundDifferences)
+            foreach (Point point in differences)
             {
-                // Draw a circle around found differences
-                g.DrawEllipse(circlePen, found.X - 15, found.Y - 15, 30, 30);
+                if (isSetupMode)
+                {
+                    g.DrawEllipse(setupPen, point.X - 15, point.Y - 15, 30, 30);
+                }
+                else if (foundDifferences.Contains(point))
+                {
+                    g.DrawEllipse(circlePen, point.X - 15, point.Y - 15, 30, 30);
+                }
             }
         }
 
-        private void cmbGameMode_SelectedIndexChanged(object sender, EventArgs e)
+        private void btnStartSetup_Click(object sender, EventArgs e)
         {
-            if (cmbGameMode.SelectedIndex == 0)
-            {
-                currentGameMode = GameMode.TimeLimit;
-                lblTime.Visible = true;
-                lblAttempts.Visible = false;
-            }
-            else
-            {
-                currentGameMode = GameMode.AttemptLimit;
-                lblTime.Visible = false;
-                lblAttempts.Visible = true;
-            }
-
-            UpdateDifficultySettings();
-        }
-
-        private void cmbDifficulty_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            switch (cmbDifficulty.SelectedIndex)
-            {
-                case 0: currentDifficulty = DifficultyLevel.Easy; break;
-                case 1: currentDifficulty = DifficultyLevel.Medium; break;
-                case 2: currentDifficulty = DifficultyLevel.Hard; break;
-            }
-
-            UpdateDifficultySettings();
+            isSetupMode = true;
+            differences.Clear();
+            setupClicksCount = 0;
+            lblSetupStatus.Text = $"Marked: 0/{totalDifferences} points";
+            btnStartGame.Enabled = false;
         }
 
         private void btnStartGame_Click(object sender, EventArgs e)
         {
-            if (image1 == null || image2 == null)
+            if (differences.Count != totalDifferences)
             {
-                MessageBox.Show("Please load images first!");
+                MessageBox.Show("Please mark all required differences first!");
                 return;
             }
 
-            InitializeGame();
-            GenerateDifferences();
-        }
+            isSetupMode = false;
+            remainingDifferences = totalDifferences;
+            foundDifferences.Clear();
 
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            timeLeft--;
-            lblTime.Text = "Time: " + timeLeft + "s";
-
-            if (timeLeft <= 0)
+            if (currentGameMode == GameMode.TimeLimit)
             {
-                timer1.Stop();
-                MessageBox.Show("Time's up! Game over.");
+                timer1.Interval = 1000;
+                timer1.Start();
             }
+
+            UpdateGameDisplay();
         }
 
         private void UpdateDifficultySettings()
@@ -287,48 +274,107 @@ namespace SpotDifferenceGame
             {
                 case DifficultyLevel.Easy:
                     totalDifferences = 3;
-                    timeLeft = 180; // 3 minutes
+                    timeLeft = 180;
                     attemptsLeft = 15;
                     break;
                 case DifficultyLevel.Medium:
                     totalDifferences = 5;
-                    timeLeft = 120; // 2 minutes
+                    timeLeft = 120;
                     attemptsLeft = 10;
                     break;
                 case DifficultyLevel.Hard:
                     totalDifferences = 8;
-                    timeLeft = 60; // 1 minute
+                    timeLeft = 60;
                     attemptsLeft = 5;
                     break;
             }
 
-            remainingDifferences = totalDifferences;
-            lblRemaining.Text = "Remaining: " + remainingDifferences;
-
-            if (currentGameMode == GameMode.TimeLimit)
-            {
-                lblTime.Text = "Time: " + timeLeft + "s";
-                timer1.Start();
-            }
-            else
-            {
-                lblAttempts.Text = "Attempts: " + attemptsLeft;
-            }
+            lblTime.Text = "Time: " + timeLeft + "s";
+            lblAttempts.Text = "Attempts: " + attemptsLeft;
+            lblSetupStatus.Text = $"Marked: 0/{totalDifferences} points";
         }
 
-        // Enum for game modes
-        private enum GameMode
+        private void cmbGameMode_SelectedIndexChanged(object sender, EventArgs e)
         {
-            TimeLimit,
-            AttemptLimit
+            currentGameMode = cmbGameMode.SelectedIndex == 0 ? GameMode.TimeLimit : GameMode.AttemptLimit;
+            lblTime.Visible = currentGameMode == GameMode.TimeLimit;
+            lblAttempts.Visible = !lblTime.Visible;
+            UpdateDifficultySettings();
         }
 
-        // Enum for difficulty levels
-        private enum DifficultyLevel
+        private void cmbDifficulty_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Easy,
-            Medium,
-            Hard
+            currentDifficulty = (DifficultyLevel)cmbDifficulty.SelectedIndex;
+            UpdateDifficultySettings();
         }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            timeLeft--;
+            lblTime.Text = "Time: " + timeLeft + "s";
+            if (timeLeft <= 0)
+            {
+                timer1.Stop();
+                MessageBox.Show("Time's up!");
+            }
+        }
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            ResetGame();
+        }
+
+        private void ResetGame()
+        {
+            timer1.Stop();
+
+            // Dispose images
+            image1?.Dispose();
+            image2?.Dispose();
+            image1 = null;
+            image2 = null;
+
+            // Clear picture boxes
+            pictureBox1.Image = null;
+            pictureBox2.Image = null;
+
+            // Reset game state
+            differences.Clear();
+            foundDifferences.Clear();
+            isSetupMode = true;
+            setupClicksCount = 0;
+
+            // Reset UI
+            lblFound.Text = "Found: 0";
+            lblRemaining.Text = "Remaining: 0";
+            lblTime.Text = "Time: 0s";
+            lblAttempts.Text = "Attempts: 0";
+
+            // Reset comboboxes
+            cmbGameMode.SelectedIndex = 0;
+            cmbDifficulty.SelectedIndex = 0;
+            currentGameMode = GameMode.TimeLimit;
+            currentDifficulty = DifficultyLevel.Easy;
+
+            UpdateDifficultySettings();
+
+            // Update button states
+            btnStartGame.Enabled = false;
+            btnStartSetup.Enabled = false;
+            btnLoadImages.Enabled = true;
+
+            pictureBox1.Refresh();
+            pictureBox2.Refresh();
+        }
+
+        private enum GameMode { TimeLimit, AttemptLimit }
+        private enum DifficultyLevel { Easy, Medium, Hard }
+
+        // Designer-generated code should include:
+        // - Two PictureBox controls (pictureBox1 and pictureBox2)
+        // - Buttons: btnLoadImages, btnStartSetup, btnStartGame
+        // - Labels: lblFound, lblRemaining, lblTime, lblAttempts, lblSetupStatus
+        // - ComboBoxes: cmbGameMode, cmbDifficulty
+        // - Timer: timer1
     }
 }
