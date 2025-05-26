@@ -45,10 +45,10 @@ M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\System.Text.Encodings.Web
 M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\System.Text.Json.xml
 M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\System.Threading.Tasks.Extensions.xml
 M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\Debug\System.ValueTuple.xml
-M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.csproj.AssemblyReference.cache
 M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.Properties.Resources.resources
 M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.csproj.GenerateResource.cache
 M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.csproj.CoreCompileInputs.cache
 M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.csproj.CopyComplete
 M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.exe
 M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.pdb
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\Debug\WindowsFormsApp1.csproj.AssemblyReference.cache

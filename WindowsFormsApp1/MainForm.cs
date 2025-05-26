@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Media;
 using System.Windows.Forms;
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using Emgu.CV.Util;
+
 
 namespace SpotDifferenceGame
 {
@@ -18,12 +23,9 @@ namespace SpotDifferenceGame
         private int timeLeft;
         private GameMode currentGameMode;
         private DifficultyLevel currentDifficulty;
-        private bool isSetupMode = true;
-        private int setupClicksCount = 0;
 
         // Visual elements
         private Pen circlePen = new Pen(Color.Red, 3);
-        private Pen setupPen = new Pen(Color.LimeGreen, 3);
         private Brush correctBrush = new SolidBrush(Color.FromArgb(100, Color.Green));
         private Brush wrongBrush = new SolidBrush(Color.FromArgb(100, Color.Red));
 
@@ -40,20 +42,14 @@ namespace SpotDifferenceGame
 
         private void InitializeGame()
         {
-            isSetupMode = true;
-            setupClicksCount = 0;
             differences.Clear();
             foundDifferences.Clear();
 
             lblFound.Text = "Found: 0";
             lblRemaining.Text = "Remaining: " + totalDifferences;
-            lblSetupStatus.Text = $"Marked: 0/{totalDifferences} points";
 
             pictureBox1.Refresh();
             pictureBox2.Refresh();
-
-            btnStartGame.Enabled = false;
-            btnStartSetup.Enabled = true;
         }
 
         private void btnLoadImages_Click(object sender, EventArgs e)
@@ -70,13 +66,14 @@ namespace SpotDifferenceGame
                     image1 = new Bitmap(openFileDialog.FileNames[0]);
                     image2 = new Bitmap(openFileDialog.FileNames[1]);
 
+                    // Resize images to match PictureBox dimensions
                     pictureBox1.Image = ScaleImage(image1, pictureBox1.Width, pictureBox1.Height);
                     pictureBox2.Image = ScaleImage(image2, pictureBox2.Width, pictureBox2.Height);
 
-                    btnStartSetup.Enabled = true;
-                    btnStartGame.Enabled = false;
-                    lblSetupStatus.Text = $"Marked: 0/{totalDifferences} points";
-                    isSetupMode = true;
+                    // Automatically detect differences
+                    DetectDifferences();
+
+                    btnStartGame.Enabled = true;
                 }
                 catch (Exception ex)
                 {
@@ -85,20 +82,77 @@ namespace SpotDifferenceGame
             }
         }
 
-
-        private void pictureBox1_Paint(object sender, PaintEventArgs e)
+        private void DetectDifferences()
         {
-            DrawFeedback(e.Graphics, pictureBox1);
+            if (pictureBox1.Image == null || pictureBox2.Image == null) return;
+
+            try
+            {
+               
+                using (Image<Bgr, byte> img1 = new Image<Bgr, byte>(pictureBox1.Image.Width, pictureBox1.Image.Height))
+                using (Image<Bgr, byte> img2 = new Image<Bgr, byte>(pictureBox2.Image.Width, pictureBox2.Image.Height))
+                {
+                    if (img1.Size != img2.Size)
+                    {
+                        MessageBox.Show("Images must be the same size!");
+                        return;
+                    }
+
+                    // Convert to grayscale
+                    Image<Gray, byte> gray1 = img1.Convert<Gray, byte>();
+                    Image<Gray, byte> gray2 = img2.Convert<Gray, byte>();
+
+                    // Compute absolute difference
+                    Image<Gray, byte> diff = gray1.AbsDiff(gray2);
+
+                    // Threshold the difference
+                    diff = diff.ThresholdBinary(new Gray(30), new Gray(255));
+
+                    // Remove small noise
+                    Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Rectangle, new Size(3, 3), new Point(-1, -1));
+                    CvInvoke.MorphologyEx(diff, diff, MorphOp.Open, kernel, new Point(-1, -1), 1, BorderType.Default, new MCvScalar(0));
+
+                    // Find contours
+                    VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
+                    Mat hierarchy = new Mat();
+                    CvInvoke.FindContours(diff, contours, hierarchy, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+
+                    // Get the largest contours (potential differences)
+                    List<Point> potentialDiffs = new List<Point>();
+                    for (int i = 0; i < contours.Size; i++)
+                    {
+                        Rectangle boundingRect = CvInvoke.BoundingRectangle(contours[i]);
+                        Point center = new Point(boundingRect.X + boundingRect.Width / 2, boundingRect.Y + boundingRect.Height / 2);
+                        potentialDiffs.Add(center);
+                    }
+
+                    // Sort by size and take the top N differences
+                    potentialDiffs.Sort((a, b) => b.X.CompareTo(a.X)); // Simple sorting for demo
+                    int diffsToTake = Math.Min(totalDifferences, potentialDiffs.Count);
+
+                    differences.Clear();
+                    for (int i = 0; i < diffsToTake; i++)
+                    {
+                        differences.Add(potentialDiffs[i]);
+                    }
+
+                    // If we found fewer differences than required, adjust the game settings
+                    if (differences.Count < totalDifferences)
+                    {
+                        totalDifferences = differences.Count;
+                        UpdateDifficultySettings();
+                        MessageBox.Show($"Only found {totalDifferences} differences. Adjusting game settings.");
+                    }
+
+                    remainingDifferences = totalDifferences;
+                    lblRemaining.Text = "Remaining: " + remainingDifferences;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error detecting differences: " + ex.Message);
+            }
         }
-
-        private void pictureBox2_Paint(object sender, PaintEventArgs e)
-        {
-            DrawFeedback(e.Graphics, pictureBox2);
-        }
-
-
-
-
 
         private Bitmap ScaleImage(Bitmap original, int maxWidth, int maxHeight)
         {
@@ -119,6 +173,27 @@ namespace SpotDifferenceGame
             return newImage;
         }
 
+        private void pictureBox1_Paint(object sender, PaintEventArgs e)
+        {
+            DrawFeedback(e.Graphics, pictureBox1);
+        }
+
+        private void pictureBox2_Paint(object sender, PaintEventArgs e)
+        {
+            DrawFeedback(e.Graphics, pictureBox2);
+        }
+
+        private void DrawFeedback(Graphics g, PictureBox pictureBox)
+        {
+            foreach (Point point in differences)
+            {
+                if (foundDifferences.Contains(point))
+                {
+                    g.DrawEllipse(circlePen, point.X - 15, point.Y - 15, 30, 30);
+                }
+            }
+        }
+
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
             HandlePictureBoxClick(e.Location, pictureBox1);
@@ -130,49 +205,6 @@ namespace SpotDifferenceGame
         }
 
         private void HandlePictureBoxClick(Point clickPoint, PictureBox pictureBox)
-        {
-            if (isSetupMode)
-            {
-                HandleSetupClick(clickPoint, pictureBox);
-            }
-            else
-            {
-                CheckDifference(clickPoint, pictureBox);
-            }
-        }
-
-        private void HandleSetupClick(Point clickPoint, PictureBox pictureBox)
-        {
-            if (setupClicksCount >= totalDifferences)
-            {
-                MessageBox.Show("Maximum differences marked!");
-                return;
-            }
-
-            if ((Control.ModifierKeys & Keys.Control) == Keys.Control)
-            {
-                var toRemove = differences.FindLast(p =>
-                    Math.Abs(p.X - clickPoint.X) < 20 &&
-                    Math.Abs(p.Y - clickPoint.Y) < 20);
-
-                if (toRemove != null)
-                {
-                    differences.Remove(toRemove);
-                    setupClicksCount--;
-                }
-            }
-            else
-            {
-                differences.Add(clickPoint);
-                setupClicksCount++;
-            }
-
-            lblSetupStatus.Text = $"Marked: {setupClicksCount}/{totalDifferences} points";
-            btnStartGame.Enabled = (setupClicksCount == totalDifferences);
-            pictureBox.Refresh();
-        }
-
-        private void CheckDifference(Point clickPoint, PictureBox pictureBox)
         {
             if (currentGameMode == GameMode.AttemptLimit && attemptsLeft <= 0)
             {
@@ -223,39 +255,14 @@ namespace SpotDifferenceGame
             MessageBox.Show("Congratulations! All differences found!");
         }
 
-        private void DrawFeedback(Graphics g, PictureBox pictureBox)
-        {
-            foreach (Point point in differences)
-            {
-                if (isSetupMode)
-                {
-                    g.DrawEllipse(setupPen, point.X - 15, point.Y - 15, 30, 30);
-                }
-                else if (foundDifferences.Contains(point))
-                {
-                    g.DrawEllipse(circlePen, point.X - 15, point.Y - 15, 30, 30);
-                }
-            }
-        }
-
-        private void btnStartSetup_Click(object sender, EventArgs e)
-        {
-            isSetupMode = true;
-            differences.Clear();
-            setupClicksCount = 0;
-            lblSetupStatus.Text = $"Marked: 0/{totalDifferences} points";
-            btnStartGame.Enabled = false;
-        }
-
         private void btnStartGame_Click(object sender, EventArgs e)
         {
-            if (differences.Count != totalDifferences)
+            if (differences.Count == 0)
             {
-                MessageBox.Show("Please mark all required differences first!");
+                MessageBox.Show("No differences detected! Try different images.");
                 return;
             }
 
-            isSetupMode = false;
             remainingDifferences = totalDifferences;
             foundDifferences.Clear();
 
@@ -291,7 +298,6 @@ namespace SpotDifferenceGame
 
             lblTime.Text = "Time: " + timeLeft + "s";
             lblAttempts.Text = "Attempts: " + attemptsLeft;
-            lblSetupStatus.Text = $"Marked: 0/{totalDifferences} points";
         }
 
         private void cmbGameMode_SelectedIndexChanged(object sender, EventArgs e)
@@ -341,8 +347,6 @@ namespace SpotDifferenceGame
             // Reset game state
             differences.Clear();
             foundDifferences.Clear();
-            isSetupMode = true;
-            setupClicksCount = 0;
 
             // Reset UI
             lblFound.Text = "Found: 0";
@@ -360,21 +364,9 @@ namespace SpotDifferenceGame
 
             // Update button states
             btnStartGame.Enabled = false;
-            btnStartSetup.Enabled = false;
-            btnLoadImages.Enabled = true;
-
-            pictureBox1.Refresh();
-            pictureBox2.Refresh();
         }
 
         private enum GameMode { TimeLimit, AttemptLimit }
         private enum DifficultyLevel { Easy, Medium, Hard }
-
-        // Designer-generated code should include:
-        // - Two PictureBox controls (pictureBox1 and pictureBox2)
-        // - Buttons: btnLoadImages, btnStartSetup, btnStartGame
-        // - Labels: lblFound, lblRemaining, lblTime, lblAttempts, lblSetupStatus
-        // - ComboBoxes: cmbGameMode, cmbDifficulty
-        // - Timer: timer1
     }
 }

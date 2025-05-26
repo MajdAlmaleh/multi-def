@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+
 namespace SpotDifferenceGame
 {
     partial class MainForm
@@ -29,8 +30,6 @@ namespace SpotDifferenceGame
             this.btnStartGame = new System.Windows.Forms.Button();
             this.btnReset = new System.Windows.Forms.Button();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.btnStartSetup = new System.Windows.Forms.Button();
-            this.lblSetupStatus = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.SuspendLayout();
@@ -143,31 +142,11 @@ namespace SpotDifferenceGame
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
 
-            // btnStartSetup
-            this.btnStartSetup.Enabled = false;
-            this.btnStartSetup.Location = new System.Drawing.Point(150, 440);
-            this.btnStartSetup.Name = "btnStartSetup";
-            this.btnStartSetup.Size = new System.Drawing.Size(120, 30);
-            this.btnStartSetup.TabIndex = 10;
-            this.btnStartSetup.Text = "Setup Mode";
-            this.btnStartSetup.UseVisualStyleBackColor = true;
-            this.btnStartSetup.Click += new System.EventHandler(this.btnStartSetup_Click);
-
-            // lblSetupStatus
-            this.lblSetupStatus.AutoSize = true;
-            this.lblSetupStatus.Location = new System.Drawing.Point(280, 445);
-            this.lblSetupStatus.Name = "lblSetupStatus";
-            this.lblSetupStatus.Size = new System.Drawing.Size(100, 13);
-            this.lblSetupStatus.TabIndex = 11;
-            this.lblSetupStatus.Text = "Marked: 0/0 points";
-
             // MainForm
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(960, 530);
             this.Controls.Add(this.btnReset);
-            this.Controls.Add(this.lblSetupStatus);
-            this.Controls.Add(this.btnStartSetup);
             this.Controls.Add(this.btnStartGame);
             this.Controls.Add(this.cmbDifficulty);
             this.Controls.Add(this.cmbGameMode);
@@ -198,7 +177,5 @@ namespace SpotDifferenceGame
         private System.Windows.Forms.Button btnStartGame;
         private System.Windows.Forms.Button btnReset;
         private System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.Button btnStartSetup;
-        private System.Windows.Forms.Label lblSetupStatus;
     }
 }
