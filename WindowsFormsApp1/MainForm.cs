@@ -132,11 +132,11 @@ namespace SpotDifferenceGame
                         using (var diff = gray1.AbsDiff(gray2))
                         {
                             // 4. Threshold to binary (differences become white)
-                            CvInvoke.Threshold(diff, diff, 40, 255, ThresholdType.Binary);
+                            CvInvoke.Threshold(diff, diff, 25, 255, ThresholdType.Binary);
 
                             // 5. Morphological operations to reduce noise
-                            Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(5, 5), Point.Empty);
-                            CvInvoke.MorphologyEx(diff, diff, MorphOp.Close, kernel, Point.Empty, 2, BorderType.Default, new MCvScalar(0));
+                            Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(1, 1), Point.Empty);
+                            CvInvoke.MorphologyEx(diff, diff, MorphOp.Close, kernel, Point.Empty, 1, BorderType.Default, new MCvScalar(0));
 
                             // 6. Find contours in the difference image
                             using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
@@ -151,7 +151,7 @@ namespace SpotDifferenceGame
                                     using (VectorOfPoint contour = contours[i])
                                     {
                                         double area = CvInvoke.ContourArea(contour);
-                                        if (area < 20) continue; // Filter small noise
+                                        if (area < 10) continue; // Filter small noise
 
                                         Rectangle rect = CvInvoke.BoundingRectangle(contour);
                                         Point center = new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
@@ -252,7 +252,7 @@ namespace SpotDifferenceGame
             foreach (Point diff in differences)
             {
                 double distance = Math.Sqrt(Math.Pow(clickPoint.X - diff.X, 2) + Math.Pow(clickPoint.Y - diff.Y, 2));
-                if (distance < 20 && !foundDifferences.Contains(diff))
+                if (distance < 15 && !foundDifferences.Contains(diff))
                 {
                     foundDifferences.Add(diff);
                     remainingDifferences--;
