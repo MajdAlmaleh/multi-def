@@ -116,6 +116,7 @@ namespace SpotDifferenceGame
                 using (Mat mat2 = BitmapToMat((Bitmap)pictureBox2.Image))
                 using (Image<Bgr, byte> img1 = mat1.ToImage<Bgr, byte>())
                 using (Image<Bgr, byte> img2 = mat2.ToImage<Bgr, byte>())
+
                 {
                     // Ensure both images have the same size
                     if (img1.Size != img2.Size)
@@ -132,7 +133,7 @@ namespace SpotDifferenceGame
                         using (var diff = gray1.AbsDiff(gray2))
                         {
                             // 4. Threshold to binary (differences become white)
-                            CvInvoke.Threshold(diff, diff, 25, 255, ThresholdType.Binary);
+                            CvInvoke.Threshold(diff, diff, 40, 255, ThresholdType.Binary);
 
                             // 5. Morphological operations to reduce noise
                             Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(1, 1), Point.Empty);
@@ -151,9 +152,12 @@ namespace SpotDifferenceGame
                                     using (VectorOfPoint contour = contours[i])
                                     {
                                         double area = CvInvoke.ContourArea(contour);
-                                        if (area < 10) continue; // Filter small noise
+                                        if (area < 10) continue; // ignore small noise
 
                                         Rectangle rect = CvInvoke.BoundingRectangle(contour);
+                                        double aspectRatio = (double)rect.Width / rect.Height;
+                                        if (aspectRatio > 4 || aspectRatio < 0.25) continue; // likely not a legit difference
+
                                         Point center = new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
                                         contourInfos.Add((i, area, center));
                                     }
