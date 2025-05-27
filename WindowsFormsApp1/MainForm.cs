@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Media;
 using System.Windows.Forms;
 using Emgu.CV;
@@ -82,70 +83,105 @@ namespace SpotDifferenceGame
             }
         }
 
-        private void DetectDifferences()
+        private Mat BitmapToMat(Bitmap bmp)
         {
-            if (pictureBox1.Image == null || pictureBox2.Image == null) return;
+            BitmapData bmpData = bmp.LockBits(
+                new Rectangle(0, 0, bmp.Width, bmp.Height),
+                ImageLockMode.ReadOnly,
+                PixelFormat.Format32bppArgb);
 
             try
             {
-               
-                using (Image<Bgr, byte> img1 = new Image<Bgr, byte>(pictureBox1.Image.Width, pictureBox1.Image.Height))
-                using (Image<Bgr, byte> img2 = new Image<Bgr, byte>(pictureBox2.Image.Width, pictureBox2.Image.Height))
+                Mat mat = new Mat(bmp.Height, bmp.Width, DepthType.Cv8U, 4, bmpData.Scan0, bmpData.Stride);
+                Mat result = new Mat();
+                CvInvoke.CvtColor(mat, result, ColorConversion.Bgra2Bgr);
+                return result;
+            }
+            finally
+            {
+                bmp.UnlockBits(bmpData);
+            }
+        }
+
+
+        private void DetectDifferences()
+        {
+            if (pictureBox1.Image == null || pictureBox2.Image == null)
+                return;
+
+            try
+            {
+                // 1. Load scaled images from PictureBox
+                using (Mat mat1 = BitmapToMat((Bitmap)pictureBox1.Image))
+                using (Mat mat2 = BitmapToMat((Bitmap)pictureBox2.Image))
+                using (Image<Bgr, byte> img1 = mat1.ToImage<Bgr, byte>())
+                using (Image<Bgr, byte> img2 = mat2.ToImage<Bgr, byte>())
                 {
+                    // Ensure both images have the same size
                     if (img1.Size != img2.Size)
                     {
-                        MessageBox.Show("Images must be the same size!");
+                        MessageBox.Show("Images must be the same size after scaling!");
                         return;
                     }
 
-                    // Convert to grayscale
-                    Image<Gray, byte> gray1 = img1.Convert<Gray, byte>();
-                    Image<Gray, byte> gray2 = img2.Convert<Gray, byte>();
-
-                    // Compute absolute difference
-                    Image<Gray, byte> diff = gray1.AbsDiff(gray2);
-
-                    // Threshold the difference
-                    diff = diff.ThresholdBinary(new Gray(30), new Gray(255));
-
-                    // Remove small noise
-                    Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Rectangle, new Size(3, 3), new Point(-1, -1));
-                    CvInvoke.MorphologyEx(diff, diff, MorphOp.Open, kernel, new Point(-1, -1), 1, BorderType.Default, new MCvScalar(0));
-
-                    // Find contours
-                    VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
-                    Mat hierarchy = new Mat();
-                    CvInvoke.FindContours(diff, contours, hierarchy, RetrType.External, ChainApproxMethod.ChainApproxSimple);
-
-                    // Get the largest contours (potential differences)
-                    List<Point> potentialDiffs = new List<Point>();
-                    for (int i = 0; i < contours.Size; i++)
+                    // 2. Convert to grayscale
+                    using (var gray1 = img1.Convert<Gray, byte>())
+                    using (var gray2 = img2.Convert<Gray, byte>())
                     {
-                        Rectangle boundingRect = CvInvoke.BoundingRectangle(contours[i]);
-                        Point center = new Point(boundingRect.X + boundingRect.Width / 2, boundingRect.Y + boundingRect.Height / 2);
-                        potentialDiffs.Add(center);
+                        // 3. Compute absolute difference
+                        using (var diff = gray1.AbsDiff(gray2))
+                        {
+                            // 4. Threshold to binary (differences become white)
+                            CvInvoke.Threshold(diff, diff, 40, 255, ThresholdType.Binary);
+
+                            // 5. Morphological operations to reduce noise
+                            Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(5, 5), Point.Empty);
+                            CvInvoke.MorphologyEx(diff, diff, MorphOp.Close, kernel, Point.Empty, 2, BorderType.Default, new MCvScalar(0));
+
+                            // 6. Find contours in the difference image
+                            using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
+                            using (Mat hierarchy = new Mat())
+                            {
+                                CvInvoke.FindContours(diff, contours, hierarchy, RetrType.List, ChainApproxMethod.ChainApproxSimple);
+
+                                List<(int idx, double area, Point center)> contourInfos = new List<(int, double, Point)>();
+
+                                for (int i = 0; i < contours.Size; i++)
+                                {
+                                    using (VectorOfPoint contour = contours[i])
+                                    {
+                                        double area = CvInvoke.ContourArea(contour);
+                                        if (area < 20) continue; // Filter small noise
+
+                                        Rectangle rect = CvInvoke.BoundingRectangle(contour);
+                                        Point center = new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
+                                        contourInfos.Add((i, area, center));
+                                    }
+                                }
+
+                                // 7. Sort by area descending and select top differences
+                                contourInfos.Sort((a, b) => b.area.CompareTo(a.area));
+
+                                differences.Clear();
+                                int diffsToTake = Math.Min(totalDifferences, contourInfos.Count);
+                                for (int i = 0; i < diffsToTake; i++)
+                                {
+                                    differences.Add(contourInfos[i].center);
+                                }
+
+                                // Update game parameters
+                                if (differences.Count < totalDifferences)
+                                {
+                                    totalDifferences = differences.Count;
+                                    UpdateDifficultySettings();
+                                    MessageBox.Show($"Adjusted to {totalDifferences} detectable differences.");
+                                }
+
+                                remainingDifferences = totalDifferences;
+                                lblRemaining.Text = "Remaining: " + remainingDifferences;
+                            }
+                        }
                     }
-
-                    // Sort by size and take the top N differences
-                    potentialDiffs.Sort((a, b) => b.X.CompareTo(a.X)); // Simple sorting for demo
-                    int diffsToTake = Math.Min(totalDifferences, potentialDiffs.Count);
-
-                    differences.Clear();
-                    for (int i = 0; i < diffsToTake; i++)
-                    {
-                        differences.Add(potentialDiffs[i]);
-                    }
-
-                    // If we found fewer differences than required, adjust the game settings
-                    if (differences.Count < totalDifferences)
-                    {
-                        totalDifferences = differences.Count;
-                        UpdateDifficultySettings();
-                        MessageBox.Show($"Only found {totalDifferences} differences. Adjusting game settings.");
-                    }
-
-                    remainingDifferences = totalDifferences;
-                    lblRemaining.Text = "Remaining: " + remainingDifferences;
                 }
             }
             catch (Exception ex)

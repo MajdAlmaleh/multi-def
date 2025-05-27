@@ -1,0 +1,108 @@
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\WindowsFormsApp1.exe.config
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\WindowsFormsApp1.exe
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\WindowsFormsApp1.pdb
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\Emgu.CV.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\MathNet.Numerics.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\Microsoft.Win32.Registry.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\NAudio.Asio.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\NAudio.Core.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\NAudio.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\NAudio.Midi.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\NAudio.Wasapi.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\NAudio.WinForms.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\NAudio.WinMM.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Buffers.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.IO.Pipelines.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Memory.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Numerics.Vectors.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Runtime.CompilerServices.Unsafe.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Security.AccessControl.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Security.Principal.Windows.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Text.Encodings.Web.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Text.Json.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Threading.Tasks.Extensions.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.ValueTuple.dll
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\Emgu.CV.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\MathNet.Numerics.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\Microsoft.Win32.Registry.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\NAudio.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\NAudio.Asio.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\NAudio.Core.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\NAudio.Midi.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\NAudio.Wasapi.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\NAudio.WinForms.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\NAudio.WinMM.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Buffers.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.IO.Pipelines.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Memory.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Numerics.Vectors.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Runtime.CompilerServices.Unsafe.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Security.AccessControl.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Security.Principal.Windows.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Text.Encodings.Web.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Text.Json.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.Threading.Tasks.Extensions.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\bin\x64\Debug\System.ValueTuple.xml
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\x64\Debug\WindowsFormsApp1.Properties.Resources.resources
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\x64\Debug\WindowsFormsApp1.csproj.GenerateResource.cache
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\x64\Debug\WindowsFormsApp1.csproj.CoreCompileInputs.cache
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\x64\Debug\WindowsFormsApp1.csproj.CopyComplete
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\x64\Debug\WindowsFormsApp1.exe
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\x64\Debug\WindowsFormsApp1.pdb
+M:\multiti\WindowsFormsApp1\WindowsFormsApp1\obj\x64\Debug\WindowsFormsApp1.csproj.AssemblyReference.cache
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\WindowsFormsApp1.exe.config
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\WindowsFormsApp1.exe
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\WindowsFormsApp1.pdb
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\Emgu.CV.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\MathNet.Numerics.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\Microsoft.Win32.Registry.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\NAudio.Asio.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\NAudio.Core.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\NAudio.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\NAudio.Midi.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\NAudio.Wasapi.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\NAudio.WinForms.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\NAudio.WinMM.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Buffers.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.IO.Pipelines.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Memory.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Numerics.Vectors.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Runtime.CompilerServices.Unsafe.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Security.AccessControl.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Security.Principal.Windows.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Text.Encodings.Web.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Text.Json.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Threading.Tasks.Extensions.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.ValueTuple.dll
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\Emgu.CV.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\MathNet.Numerics.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\Microsoft.Win32.Registry.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\NAudio.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\NAudio.Asio.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\NAudio.Core.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\NAudio.Midi.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\NAudio.Wasapi.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\NAudio.WinForms.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\NAudio.WinMM.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Buffers.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.IO.Pipelines.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Memory.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Numerics.Vectors.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Runtime.CompilerServices.Unsafe.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Security.AccessControl.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Security.Principal.Windows.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Text.Encodings.Web.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Text.Json.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.Threading.Tasks.Extensions.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\bin\x64\Debug\System.ValueTuple.xml
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\obj\x64\Debug\WindowsFormsApp1.csproj.AssemblyReference.cache
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\obj\x64\Debug\WindowsFormsApp1.Properties.Resources.resources
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\obj\x64\Debug\WindowsFormsApp1.csproj.GenerateResource.cache
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\obj\x64\Debug\WindowsFormsApp1.csproj.CoreCompileInputs.cache
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\obj\x64\Debug\WindowsFormsApp1.csproj.CopyComplete
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\obj\x64\Debug\WindowsFormsApp1.exe
+M:\multiti\WindowsFormsApp1 - Copy\WindowsFormsApp1\obj\x64\Debug\WindowsFormsApp1.pdb
