@@ -14,23 +14,23 @@ namespace SpotDifferenceGame
 {
     public partial class MainForm : Form
     {
-        // Game variables
+        
         private Bitmap image1, image2;
         private List<Point> differences = new List<Point>();
         private List<Point> foundDifferences = new List<Point>();
-        private int totalDifferences = 5;
+        private int totalDifferences = 3;
         private int remainingDifferences;
         private int attemptsLeft;
         private int timeLeft;
         private GameMode currentGameMode;
         private DifficultyLevel currentDifficulty;
 
-        // Visual elements
+       
         private Pen circlePen = new Pen(Color.Red, 3);
-        private Brush correctBrush = new SolidBrush(Color.FromArgb(100, Color.Green));
-        private Brush wrongBrush = new SolidBrush(Color.FromArgb(100, Color.Red));
+      //  private Brush correctBrush = new SolidBrush(Color.FromArgb(100, Color.Green));
+       // private Brush wrongBrush = new SolidBrush(Color.FromArgb(100, Color.Red));
 
-        // Sounds
+        
         private SoundPlayer correctSound = new SoundPlayer(WindowsFormsApp1.Properties.Resources.correct);
         private SoundPlayer wrongSound = new SoundPlayer(WindowsFormsApp1.Properties.Resources.inccorect);
 
@@ -67,11 +67,11 @@ namespace SpotDifferenceGame
                     image1 = new Bitmap(openFileDialog.FileNames[0]);
                     image2 = new Bitmap(openFileDialog.FileNames[1]);
 
-                    // Resize images to match PictureBox dimensions
+              
                     pictureBox1.Image = ScaleImage(image1, pictureBox1.Width, pictureBox1.Height);
                     pictureBox2.Image = ScaleImage(image2, pictureBox2.Width, pictureBox2.Height);
 
-                    // Automatically detect differences
+             
                     DetectDifferences();
 
                     btnStartGame.Enabled = true;
@@ -111,35 +111,38 @@ namespace SpotDifferenceGame
 
             try
             {
-                // 1. Load scaled images from PictureBox
+
                 using (Mat mat1 = BitmapToMat((Bitmap)pictureBox1.Image))
                 using (Mat mat2 = BitmapToMat((Bitmap)pictureBox2.Image))
                 using (Image<Bgr, byte> img1 = mat1.ToImage<Bgr, byte>())
                 using (Image<Bgr, byte> img2 = mat2.ToImage<Bgr, byte>())
 
                 {
-                    // Ensure both images have the same size
                     if (img1.Size != img2.Size)
                     {
                         MessageBox.Show("Images must be the same size after scaling!");
                         return;
                     }
 
-                    // 2. Convert to grayscale
                     using (var gray1 = img1.Convert<Gray, byte>())
                     using (var gray2 = img2.Convert<Gray, byte>())
                     {
-                        // 3. Compute absolute difference
+                        
                         using (var diff = gray1.AbsDiff(gray2))
                         {
-                            // 4. Threshold to binary (differences become white)
+                           
+                            CvInvoke.Imshow("Before Threshold", diff); 
+
+                          
                             CvInvoke.Threshold(diff, diff, 40, 255, ThresholdType.Binary);
 
-                            // 5. Morphological operations to reduce noise
-                            Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(1, 1), Point.Empty);
-                            CvInvoke.MorphologyEx(diff, diff, MorphOp.Close, kernel, Point.Empty, 1, BorderType.Default, new MCvScalar(0));
+                            CvInvoke.Imshow("After Threshold", diff);            
+   
+                            Mat kernel = CvInvoke.GetStructuringElement(ElementShape.Ellipse, new Size(3, 3), Point.Empty);
+                            CvInvoke.MorphologyEx(diff, diff, MorphOp.Close, kernel, Point.Empty, 3, BorderType.Default, new MCvScalar(0));
 
-                            // 6. Find contours in the difference image
+                            CvInvoke.Imshow("After Morph", diff);
+
                             using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
                             using (Mat hierarchy = new Mat())
                             {
@@ -152,28 +155,27 @@ namespace SpotDifferenceGame
                                     using (VectorOfPoint contour = contours[i])
                                     {
                                         double area = CvInvoke.ContourArea(contour);
-                                        if (area < 10) continue; // ignore small noise
+                                        if (area < 10) continue; 
 
                                         Rectangle rect = CvInvoke.BoundingRectangle(contour);
                                         double aspectRatio = (double)rect.Width / rect.Height;
-                                        if (aspectRatio > 4 || aspectRatio < 0.25) continue; // likely not a legit difference
+                                        if (aspectRatio > 4 || aspectRatio < 0.25) continue; 
 
                                         Point center = new Point(rect.X + rect.Width / 2, rect.Y + rect.Height / 2);
                                         contourInfos.Add((i, area, center));
                                     }
                                 }
 
-                                // 7. Sort by area descending and select top differences
                                 contourInfos.Sort((a, b) => b.area.CompareTo(a.area));
-
                                 differences.Clear();
                                 int diffsToTake = Math.Min(totalDifferences, contourInfos.Count);
+                               
                                 for (int i = 0; i < diffsToTake; i++)
                                 {
                                     differences.Add(contourInfos[i].center);
                                 }
 
-                                // Update game parameters
+                               
                                 if (differences.Count < totalDifferences)
                                 {
                                     totalDifferences = differences.Count;
@@ -374,27 +376,27 @@ namespace SpotDifferenceGame
         {
             timer1.Stop();
 
-            // Dispose images
+          
             image1?.Dispose();
             image2?.Dispose();
             image1 = null;
             image2 = null;
 
-            // Clear picture boxes
+           
             pictureBox1.Image = null;
             pictureBox2.Image = null;
 
-            // Reset game state
+           
             differences.Clear();
             foundDifferences.Clear();
 
-            // Reset UI
+     
             lblFound.Text = "Found: 0";
             lblRemaining.Text = "Remaining: 0";
             lblTime.Text = "Time: 0s";
             lblAttempts.Text = "Attempts: 0";
 
-            // Reset comboboxes
+           
             cmbGameMode.SelectedIndex = 0;
             cmbDifficulty.SelectedIndex = 0;
             currentGameMode = GameMode.TimeLimit;
@@ -402,7 +404,6 @@ namespace SpotDifferenceGame
 
             UpdateDifficultySettings();
 
-            // Update button states
             btnStartGame.Enabled = false;
         }
 
